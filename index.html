@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>creeper_run</title>
+  <script>
+    var img = new Array();
+  </script>
+</head>
+
+<body onload="title();">
+  <form>
+    <div id="title_button"><input type="button" value=" " onclick="add_water()" /></div>
+  </form>
+
+  <canvas id="cv3" width="800" height="540"></canvas>
+  <script>
+    let move = 0;
+    const FIELD_WIDTH = 80,
+      FIELD_HEIGHT = 54;
+    let amount = new Array()
+    let variable = new Array()
+    let concentration = new Array()
+
+
+
+    function title() {
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        amount[i] = new Array();
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          amount[i][j] = 0;
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        variable[i] = new Array();
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          variable[i][j] = 0;
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        concentration[i] = new Array();
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          concentration[i][j] = 0;
+        }
+      }
+      var ctx = document.getElementById("cv3").getContext("2d");
+      ctx.fillStyle = "rgba(200,200,200,1)";
+      ctx.fillRect(0, 0, 800, 540)
+      ctx.strokeStyle = "rgba(200,200,200,1)";
+      ctx.strokeRect(0, 0, 800, 540)
+      //  amount[20][20] = 500000
+      main()
+    }
+
+    function add_water(aa) {
+      amount[32][28] = 1000000
+
+    }
+
+    function main() {
+      //alert("start")
+      move++
+
+      var ctx = document.getElementById("cv3").getContext("2d");
+      ctx.fillStyle = "rgba(200,200,200,1)";
+      ctx.fillRect(0, 0, 800, 540)
+      ctx.strokeStyle = "rgba(200,200,200,1)";
+      ctx.strokeRect(0, 0, 800, 540)
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          variable[i][j] = 0;
+        }
+      }
+      /*
+      if (amount[10][5] > 0) amount[10][5] += 500000;
+      if (amount[40][20] > 0) amount[40][20] += 10000;
+      if (amount[60][35] > 0) amount[60][35] += 2000000;
+      if (amount[50][10] > 0) amount[50][10] += 50000;
+      if (amount[20][40] > 0) amount[20][40] += 100000;
+*/
+
+
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          check_water(i, j)
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          move_water(i, j)
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          dry_water(i, j)
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          convert_water(i, j)
+        }
+      }
+
+      for (var i = 0; i < FIELD_WIDTH; i++) {
+        for (var j = 0; j < FIELD_HEIGHT; j++) {
+          display_water(i, j)
+        }
+      }
+
+      function addbullet(states, posX, posY, veloX, veloY, endu) {
+        let temp = new Array();
+        temp.push(states, posX, posY, veloX, veloY, endu);
+        bulletList.push(temp)
+      }
+      /*
+      ctx.fillStyle = "rgba(200,0,50,1)";
+      ctx.fillRect(100 - 2, 50 - 2, 14, 14)
+      ctx.fillRect(400 - 2, 200 - 2, 14, 14)
+      ctx.fillRect(600 - 2, 350 - 2, 14, 14)
+      ctx.fillRect(500 - 2, 100 - 2, 14, 14)
+      ctx.fillRect(200 - 2, 400 - 2, 14, 14)
+*/
+
+      setTimeout('main()', 20)
+    }
+
+    function check_water(x, y) {
+      if (x > 0) compare_water(x, y, x - 1, y);
+      if (x < FIELD_WIDTH - 1) compare_water(x, y, x + 1, y);
+      if (y > 0) compare_water(x, y, x, y - 1);
+      if (y < FIELD_HEIGHT - 1) compare_water(x, y, x, y + 1);
+    }
+
+    function compare_water(x1, y1, x2, y2) {
+      let difference
+      if (amount[x1][y1] > amount[x2][y2]) {
+        difference = amount[x1][y1] - amount[x2][y2]
+        if (amount[x2][y2] != 0 || difference >= 10) {
+          variable[x1][y1] = variable[x1][y1] - difference / 10
+          variable[x2][y2] = variable[x2][y2] + difference / 10
+        }
+      }
+    }
+
+    function move_water(x, y) {
+      if (variable[x][y] != 0) amount[x][y] += variable[x][y];
+    }
+
+    function dry_water(x, y) {
+      amount[x][y] -= 1.0;
+      if (amount[x][y] < 0) amount[x][y] = 0;
+    }
+
+    function convert_water(x, y) {
+      if (amount[x][y] > 0) {
+        concentration[x][y] = Math.floor((Math.LOG10E * Math.log(amount[x][y]))) / 10 + 0.1
+      } else {
+        concentration[x][y] = 0
+      }
+    }
+
+    function display_water(x, y) {
+      var ctx = document.getElementById("cv3").getContext("2d");
+      ctx.fillStyle = "rgba(50,50,255 ," + concentration[x][y] + ")";
+      ctx.fillRect(x * 10, y * 10, 10, 10)
+    }
+
+
+
+
+    function delay(s) { // s秒後に解決するプロミスを返す関数
+      return new Promise(ok => setTimeout(ok, s))
+    }
+  </script>
+  <div id="piyo">
+  </div>
+
+</body>
+
+</html>
